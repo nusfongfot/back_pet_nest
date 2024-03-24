@@ -34,7 +34,7 @@ export class AuthController {
         audience: process.env.CLIENT_GOOGLE_ID,
       });
       // console.log('ticker', ticket.getPayload());
-      const options = { expiresIn: '1d' };
+      const options = { expiresIn: '30d' };
       const user = await User.findOne({
         where: { email: ticket.getPayload().email },
       });

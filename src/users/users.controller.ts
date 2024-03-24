@@ -1,8 +1,10 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { User } from '../../models/user.model';
 import { UsersService } from './users.service';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthenGuard } from 'src/auth/guards/auth.guard';
+import { AdminGuard } from 'src/auth/guards/admin.guard';
+import { Address } from 'models/address.model';
+import { User } from 'models/user.model';
 
 @Controller('api/users')
 export class UsersController {
@@ -15,27 +17,33 @@ export class UsersController {
   @Get('my-profile')
   async getProfile(@Req() req: any) {
     try {
-      const { authorization } = req.headers;
-      const token = authorization.split(' ')[1];
-      const emailUser = await this.authService.validateToken(token);
-      const user = await User.findOne({
-        where: {
-          email: emailUser.email,
-        },
-      });
-
+      const user = await this.authService.checkTokenEmailOfUser(req);
       return { data: user };
     } catch (error) {
       return error;
     }
   }
 
+  @UseGuards(AdminGuard)
   @Get('all')
   async getAllUsers() {
-    const data = await User.findAll({
-      attributes: { exclude: ['password'] },
-    });
-    return { data };
+    try {
+      const data = await User.findAll({
+        include: [
+          {
+            model: Address,
+            attributes: ['province'],
+            where: {
+              isDefault: true,
+            },
+          },
+        ],
+        attributes: { exclude: ['password'] },
+      });
+      return { data };
+    } catch (error) {
+      return { error };
+    }
   }
 
   // @Post('insert')

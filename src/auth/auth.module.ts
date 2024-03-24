@@ -16,7 +16,7 @@ import { GoogleStrategy } from './strategy/google.strategy';
     ConfigModule.forRoot({ envFilePath: '.env.local' }),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1d' },
+      signOptions: { expiresIn: '30d' },
     }),
   ],
   providers: [AuthService, JwtStrategy, GoogleStrategy],

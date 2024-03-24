@@ -8,7 +8,7 @@ import {
 } from 'sequelize-typescript';
 import { generateFixedLengthId } from 'services/genId';
 import { Review } from './review.model';
-import { Order } from './order.model';
+import { Cart } from './cart.model';
 
 @Table
 export class Product extends Model {
@@ -41,8 +41,8 @@ export class Product extends Model {
   deleted: boolean;
 
   @HasMany(() => Review, 'productId')
-  reviews: any[];
+  reviews: Review[];
 
-  @HasMany(() => Order, 'productId')
-  orders: any[];
+  @HasMany(() => Cart, 'productId')
+  sold: Cart[];
 }

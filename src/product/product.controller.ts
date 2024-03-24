@@ -13,13 +13,13 @@ import {
 import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { ProductDto } from './dto/product.dto';
 import { Product } from 'models/product.model';
-import { Order } from 'models/order.model';
 import { Review } from 'models/review.model';
 import { Op, Sequelize } from 'sequelize';
-
+import { Cart } from 'models/cart.model';
+import { AppService } from 'src/app.service';
 @Controller('api/product')
 export class ProductController {
-  constructor() {}
+  constructor(private appService: AppService) {}
 
   @Get('all')
   async getAllProducts() {
@@ -32,10 +32,10 @@ export class ProductController {
             required: false,
           },
           {
-            model: Order,
-            attributes: ['orderId', 'productId'],
+            model: Cart,
+            attributes: ['qty'],
             where: {
-              status: 'Successful delivery',
+              status: 'Already ordered',
             },
             required: false,
           },
@@ -45,6 +45,119 @@ export class ProductController {
         },
         order: [['createdAt', 'DESC']],
       });
+
+      return { data };
+    } catch (error) {
+      return error;
+    }
+  }
+
+  @Get('all/cate/:category')
+  async getAllProductsByCategory(@Param() params: any) {
+    try {
+      const data = await Product.findAll({
+        include: [
+          {
+            model: Review,
+            attributes: ['name', 'star'],
+            required: false,
+          },
+          {
+            model: Cart,
+            attributes: ['qty'],
+            where: {
+              status: 'Already ordered',
+            },
+            required: false,
+          },
+        ],
+        where: {
+          category: params.category,
+          deleted: false,
+        },
+        order: [['createdAt', 'DESC']],
+      });
+
+      return { data };
+    } catch (error) {
+      return error;
+    }
+  }
+
+  @Get('all/brand/:name')
+  async getAllProductsByBrand(@Param() params: any) {
+    try {
+      const data = await Product.findAll({
+        include: [
+          {
+            model: Review,
+            attributes: ['name', 'star'],
+            required: false,
+          },
+          {
+            model: Cart,
+            attributes: ['qty'],
+            where: {
+              status: 'Already ordered',
+            },
+            required: false,
+          },
+        ],
+        where: {
+          brand: params.name,
+          deleted: false,
+        },
+        order: [['createdAt', 'DESC']],
+      });
+
+      return { data };
+    } catch (error) {
+      return error;
+    }
+  }
+
+  @Get('all/brand')
+  async getAllProductsOfBrand() {
+    try {
+      const products = await Product.findAll({
+        attributes: ['brand'],
+        where: {
+          deleted: false,
+        },
+        order: [['createdAt', 'DESC']],
+      });
+      const data = [...new Set(products.map((product) => product.brand))];
+      return { data };
+    } catch (error) {
+      return error;
+    }
+  }
+
+  @Get('all/recommend')
+  async getAllProductsByRecommend() {
+    try {
+      const product = await Product.findAll({
+        include: [
+          {
+            model: Review,
+            attributes: ['name', 'star'],
+            required: false,
+          },
+          {
+            model: Cart,
+            attributes: ['qty'],
+            where: {
+              status: 'Already ordered',
+            },
+            required: false,
+          },
+        ],
+        where: {
+          deleted: false,
+        },
+        limit: 4,
+      });
+      const data = this.appService.shuffleArray(product);
 
       return { data };
     } catch (error) {
@@ -80,18 +193,29 @@ export class ProductController {
   @Get('bestseller')
   async getProductBestSeller() {
     try {
-      const data = await Order.findAll({
-        where: {
-          status: 'Successful delivery',
-        },
+      const data = await Product.findAll({
         include: [
-          { model: Product, attributes: ['title', 'price', 'qty', 'images'] },
+          {
+            model: Review,
+            attributes: ['name', 'star'],
+            required: false,
+          },
+          {
+            model: Cart,
+            attributes: ['qty'],
+            where: {
+              status: 'Already ordered',
+            },
+            order: [['qty', 'DESC']],
+            required: true,
+          },
         ],
-        group: ['productId'],
-        order: [['createdAt', 'DESC']],
-        attributes: ['orderId', 'productId', 'qty'],
+        where: {
+          deleted: false,
+        },
         limit: 4,
       });
+
       return { data };
     } catch (error) {
       return error;
@@ -102,6 +226,22 @@ export class ProductController {
   async searchProduct(@Query() query: any) {
     const q = query.keyword;
     const data = await Product.findAll({
+      include: [
+        {
+          model: Review,
+          attributes: ['name', 'star'],
+          required: false,
+        },
+        {
+          model: Cart,
+          attributes: ['qty'],
+          where: {
+            status: 'Already ordered',
+          },
+          required: false,
+        },
+      ],
+
       order: [['createdAt', 'DESC']],
       where: {
         [Op.or]: [
@@ -119,6 +259,7 @@ export class ProductController {
             },
           },
         ],
+        deleted: false,
       },
       replacements: { query: `%${q.toLowerCase()}%` },
     });

@@ -4,10 +4,8 @@ import {
   Table,
   PrimaryKey,
   DataType,
-  BelongsTo,
 } from 'sequelize-typescript';
 import { generateFixedLengthId } from 'services/genId';
-import { User } from './user.model';
 
 @Table
 export class Address extends Model {
@@ -47,7 +45,4 @@ export class Address extends Model {
 
   @Column({ defaultValue: false })
   deleted: boolean;
-
-  @BelongsTo(() => User, 'userId')
-  user: any;
 }

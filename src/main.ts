@@ -28,7 +28,14 @@ async function bootstrap() {
   );
   app.use(passport.initialize());
   app.use(passport.session());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true, // <- This line here
+      },
+    }),
+  );
   // cors
   app.enableCors({
     // origin: 'http://localhost:3000',

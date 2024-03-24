@@ -7,7 +7,6 @@ import {
   BelongsTo,
 } from 'sequelize-typescript';
 import { generateFixedLengthId } from 'services/genId';
-import { Product } from './product.model';
 import { User } from './user.model';
 import { Address } from './address.model';
 
@@ -18,16 +17,10 @@ export class Order extends Model {
   orderId: string;
 
   @Column
-  productId: string;
-
-  @Column
   userId: string;
 
   @Column
   addressId: string;
-
-  @Column
-  qty: string;
 
   @Column({ defaultValue: '' })
   slip: string;
@@ -38,12 +31,12 @@ export class Order extends Model {
   @Column
   status: string;
 
-  @BelongsTo(() => Product, 'productId')
-  product: object;
+  @Column({ type: DataType.JSON })
+  details: JSON;
 
   @BelongsTo(() => User, 'userId')
-  user: object;
+  user: User;
 
   @BelongsTo(() => Address, 'addressId')
-  address: object;
+  address: Address;
 }

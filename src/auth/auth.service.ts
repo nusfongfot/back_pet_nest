@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserDto } from 'src/users/dto';
@@ -9,7 +9,7 @@ export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
   async validateUser(details: UserDto) {
-    const options = { expiresIn: '1d' };
+    const options = { expiresIn: '30d' };
     const user = await User.findOne({ where: { email: details.email } });
 
     if (user) {
@@ -41,6 +41,19 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async checkTokenEmailOfUser(@Req() req: any) {
+    const { authorization } = req.headers;
+    const token = authorization.split(' ')[1];
+    const emailUser = await this.validateToken(token);
+    const user = await User.findOne({
+      where: {
+        email: emailUser.email,
+      },
+    });
+
+    return { data: user };
   }
 
   async hashedPassword(password: string) {

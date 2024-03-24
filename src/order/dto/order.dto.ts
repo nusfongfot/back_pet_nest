@@ -1,9 +1,9 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class OrderDto {
-  @IsString()
-  @IsNotEmpty()
-  productId: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // productId: string;
 
   @IsString()
   @IsNotEmpty()
@@ -13,9 +13,9 @@ export class OrderDto {
   @IsNotEmpty()
   addressId: string;
 
-  @IsString()
-  @IsNotEmpty()
-  qty: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // qty: string;
 
   @IsString()
   slip: string;
@@ -23,6 +23,9 @@ export class OrderDto {
   @IsString()
   @IsNotEmpty()
   payment: string;
+
+  @IsString()
+  details: string;
 
   @IsString()
   status: string;

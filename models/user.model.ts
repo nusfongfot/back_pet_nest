@@ -4,8 +4,10 @@ import {
   Table,
   PrimaryKey,
   DataType,
+  HasMany,
 } from 'sequelize-typescript';
 import { generateFixedLengthId } from 'services/genId';
+import { Address } from './address.model';
 
 @Table
 export class User extends Model {
@@ -27,4 +29,7 @@ export class User extends Model {
 
   @Column({ defaultValue: 'user' })
   level: string;
+
+  @HasMany(() => Address, 'userId')
+  address: Address;
 }
