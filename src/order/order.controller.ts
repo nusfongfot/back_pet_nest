@@ -234,14 +234,14 @@ export class OrderController {
 
       orders.forEach((item) => {
         const dataCurrentDay = new Date(item.createdAt).getDay();
-        const details = JSON.parse(item.details as any);
 
+        const details = JSON.parse(item.details as any);
         if (!weeklyRevenue[dataCurrentDay]) {
           weeklyRevenue[dataCurrentDay] = 0;
         }
 
-        const filterDataCurrentWeek = details.filter((val) => {
-          const currentWeek = dayjs(val.createdAt).week();
+        const filterDataCurrentWeek = details.filter(() => {
+          const currentWeek = dayjs().week();
           const weekOfData = dayjs(item.createdAt).week();
           return currentWeek == weekOfData;
         });

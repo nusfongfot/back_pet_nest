@@ -155,7 +155,7 @@ export class ProductController {
         where: {
           deleted: false,
         },
-        limit: 4,
+        limit: 5,
       });
       const data = this.appService.shuffleArray(product);
 
